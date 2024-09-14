@@ -180,7 +180,7 @@ function handleTransaction(action) {
 
         const purchasePrice = portfolio[cryptoSymbol].purchasePrice;
         const totalPurchaseCost = purchasePrice * quantity;
-        const sellingPrice = purchasePrice * 1.05; // Tambahkan 5% keuntungan
+        const sellingPrice = purchasePrice * 1.85; // Tambahkan 5% keuntungan
         const totalSellingCost = sellingPrice * quantity;
         const profit = totalSellingCost - totalPurchaseCost;
         const profitPercentage = (profit / totalPurchaseCost) * 100;
