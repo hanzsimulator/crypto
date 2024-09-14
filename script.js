@@ -28,7 +28,7 @@ const purchasePrices = {};
 
 // Data dummy untuk grafik
 const chartData = cryptocurrencies.reduce((data, crypto) => {
-    data[crypto.symbol] = { labels: [], data: [] };
+    data[crypto.symbol] = { labels: [], data: [], buySellMarkers: [] };
     return data;
 }, {});
 
@@ -98,7 +98,7 @@ function updateCryptoPrices() {
         chartData[symbol].data.push(crypto.price);
 
         // Batasi data grafik untuk 20 titik
-        if (chartData[symbol].labels.length > 20) {
+        if (chartData[symbol].labels.length > 20999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999) {
             chartData[symbol].labels.shift();
             chartData[symbol].data.shift();
         }
@@ -122,19 +122,39 @@ function updateCharts() {
         if (chart) {
             chart.data.labels = data.labels;
             chart.data.datasets[0].data = data.data;
+            chart.data.datasets[1] = {
+                label: 'Transactions',
+                data: data.buySellMarkers.map(marker => ({ x: marker.x, y: marker.y })),
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 1,
+                pointRadius: 5,
+                pointBackgroundColor: data.buySellMarkers.map(marker => marker.type === 'buy' ? 'green' : 'red')
+            };
             chart.update();
         } else {
             window[`chart${crypto.symbol}`] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.labels,
-                    datasets: [{
-                        label: `Harga ${crypto.name}`,
-                        data: data.data,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {
+                            label: `Harga ${crypto.name}`,
+                            data: data.data,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Transactions',
+                            data: data.buySellMarkers.map(marker => ({ x: marker.x, y: marker.y })),
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 1,
+                            pointRadius: 5,
+                            pointBackgroundColor: data.buySellMarkers.map(marker => marker.type === 'buy' ? 'green' : 'red')
+                        }
+                    ]
                 },
                 options: {
                     scales: {
@@ -172,6 +192,13 @@ function handleTransaction(action) {
         portfolio[cryptoSymbol].quantity += quantity;
         balance -= totalCost;
         purchasePrices[cryptoSymbol] = crypto.price; // Simpan harga beli terakhir
+
+        // Tambah penanda transaksi untuk pembelian
+        chartData[cryptoSymbol].buySellMarkers.push({
+            x: chartData[cryptoSymbol].labels[chartData[cryptoSymbol].labels.length - 1],
+            y: crypto.price,
+            type: 'buy'
+        });
     } else if (action === 'sell') {
         if (!portfolio[cryptoSymbol] || portfolio[cryptoSymbol].quantity < quantity) {
             alert('Jumlah cryptocurrency yang Anda miliki tidak mencukupi.');
@@ -180,7 +207,12 @@ function handleTransaction(action) {
 
         const purchasePrice = portfolio[cryptoSymbol].purchasePrice;
         const totalPurchaseCost = purchasePrice * quantity;
-        const sellingPrice = purchasePrice * 1.85; // Tambahkan 5% keuntungan
+
+        // Set selling price to fluctuate ±85% around the purchase price
+        const fluctuation = 0.85; // ±85%
+        const randomMultiplier = 1 - fluctuation + Math.random() * (2 * fluctuation); // Random value between 0.15 and 1.85
+        const sellingPrice = purchasePrice * randomMultiplier; // Fluctuate the selling price
+
         const totalSellingCost = sellingPrice * quantity;
         const profit = totalSellingCost - totalPurchaseCost;
         const profitPercentage = (profit / totalPurchaseCost) * 100;
@@ -192,11 +224,19 @@ function handleTransaction(action) {
         if (portfolio[cryptoSymbol].quantity === 0) {
             delete portfolio[cryptoSymbol];
         }
+
+        // Tambah penanda transaksi untuk penjualan
+        chartData[cryptoSymbol].buySellMarkers.push({
+            x: chartData[cryptoSymbol].labels[chartData[cryptoSymbol].labels.length - 1],
+            y: sellingPrice,
+            type: 'sell'
+        });
     }
 
     renderPortfolio();
     renderBalance();
     saveData(); // Simpan data setelah transaksi
+    updateCharts(); // Update charts after transactions
 }
 
 // Top-Up Saldo
