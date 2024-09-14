@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptocurrency Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            margin: 20px 0;
+        }
+        div {
+            margin: 10px 0;
+        }
+        #balance {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr; /* 1 column */
+            gap: 10px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+        .chart-container canvas {
+            width: 100% !important; /* Make sure the canvas takes the full width of its container */
+            height: 300px !important; /* Set a fixed height for each chart */
+        }
+    </style>
+</head>
+<body>
+    <h1>Cryptocurrency Simulator</h1>
+    <div>
+        <h2>Cryptocurrency List</h2>
+        <div id="crypto-list"></div>
+    </div>
+    <div>
+        <h2>Buy/Sell Cryptocurrency</h2>
+        <select id="crypto-select">
+            <!-- Options will be populated by JavaScript -->
+        </select>
+        <input type="number" id="quantity" placeholder="Quantity">
+        <button id="buy-button">Buy</button>
+        <button id="sell-button">Sell</button>
+    </div>
+    <div>
+        <h2>Assets</h2>
+        <div id="portfolio-info"></div>
+    </div>
+    <div>
+        <h2>Balance</h2>
+        <div id="balance">0.00</div>
+        <button id="top-up-button">Top Up</button>
+    </div>
+    <div>
+        <h2>Charts</h2>
+        <div class="chart-container">
+            <canvas id="chart-btc"></canvas>
+            <canvas id="chart-eth"></canvas>
+            <canvas id="chart-bnb"></canvas>
+            <canvas id="chart-ada"></canvas>
+            <canvas id="chart-sol"></canvas>
+            <canvas id="chart-xrp"></canvas>
+            <canvas id="chart-dot"></canvas>
+            <canvas id="chart-doge"></canvas>
+            <canvas id="chart-shib"></canvas>
+            <canvas id="chart-ltc"></canvas>
+            <canvas id="chart-link"></canvas>
+            <canvas id="chart-matic"></canvas>
+            <canvas id="chart-trx"></canvas>
+            <canvas id="chart-xlm"></canvas>
+            <canvas id="chart-uni"></canvas>
+            <canvas id="chart-bch"></canvas>
+            <canvas id="chart-vet"></canvas>
+            <canvas id="chart-ftm"></canvas>
+            <canvas id="chart-cro"></canvas>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Hanggar. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
